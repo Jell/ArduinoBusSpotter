@@ -1,7 +1,7 @@
 //************************************************************************
 //					Nokia Shield
 //************************************************************************
-//* Derived from code by James P. Lynch and Mark Sproul.	
+//* Derived from code by James P. Lynch and Mark Sproul.
 //*
 //*Edit History
 //*		<MLS>	= Mark Sproul, msproul -at- jove.rutgers.edu
@@ -36,21 +36,24 @@ byte cont = 80;  // Good center value for contrast
 //************************************************************************
 void	setup()
 {
+  WiFly.begin();
+  WiFly.end();
+
   ioinit();           //Initialize I/O
   LCDInit();	    //Initialize the LCD
   LCDClear(GREEN);    // Clear LCD to a solid color
   LCDPutStr("Connecting...", 0, 4, ORANGE, WHITE); // Write instructions on display
-  
-  WiFly.begin();
-  boolean success = WiFly.join("", "");
+
+  WiFly.restore();
+  boolean success = WiFly.join("Gillian", "No0neShallPASS");
+  WiFly.end();
 
   if(success){
-    
-      LCDClear(BLUE);    // Clear LCD to a solid color
-      LCDPutStr("Success!", 0, 4, ORANGE, WHITE); // Write instructions on display
+    LCDClear(BLUE);    // Clear LCD to a solid color
+    LCDPutStr("Success!", 0, 4, ORANGE, WHITE); // Write instructions on display
   }else{
-      LCDClear(GREEN);    // Clear LCD to a solid color
-      LCDPutStr("Fail!", 0, 4, ORANGE, WHITE); // Write instructions on display
+    LCDClear(GREEN);    // Clear LCD to a solid color
+    LCDPutStr("Fail!", 0, 4, ORANGE, WHITE); // Write instructions on display
   }
 }
 
