@@ -1,2 +1,2 @@
-const char *wifi_login = "";
-const char *wifi_password = "";
+const char *ssid = "";
+const char *passphrase = "";
