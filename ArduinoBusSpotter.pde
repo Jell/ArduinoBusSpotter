@@ -43,7 +43,7 @@ void setup() {
     client.println("HEAD /search?q=arduino HTTP/1.0");
     client.println();
     WiFly.end();
-    LCDPutString("Connected!", 1,21, GREEN, BLUE);
+    LCDPutString("Connected!", 1,17, GREEN, BLUE);
     WiFly.restore();
 
   } else {
@@ -55,7 +55,7 @@ void setup() {
 }
 
 int posx = 1;
-int posy = 41;
+int posy = 33;
 void loop() {
   if (client.available()) {
     char c = client.read();
