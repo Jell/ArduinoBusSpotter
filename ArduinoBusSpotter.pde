@@ -11,57 +11,32 @@
 
 #include "credentials.h"
 
-
-byte server[] = { 66, 249, 89, 104 }; // Google
-
-//Client client(server, 80);
-
-Client client("google.com", 80);
+Client client("jawaninja.com", 1234);
 
 void setup() {
   Serial.begin(9600);
 
   WiFly.begin();
-
+  delay(2000); // Let the shield wake up
   WiFly.end();
 
   LCDIoInit();
   LCDInit();
   LCDClear(BLUE);
   LCDPutString("Connecting...", 1,1, GREEN, BLUE);
-
-  WiFly.restore();
-  if (!WiFly.join(ssid, passphrase)) {
-    WiFly.end();
-    LCDDrawRectangle(1,1,100,10, RED);
-    while (1) {
-      // Hang on failure.
-    }
-  }
-
-  if (client.connect()) {
-    client.println("HEAD /search?q=arduino HTTP/1.0");
-    client.println();
-    WiFly.end();
-    LCDPutString("Connected!", 1,17, GREEN, BLUE);
-    WiFly.restore();
-
-  } else {
-    WiFly.end();
-    LCDPutString("Failed!", 1,21, RED, BLUE);
-    WiFly.restore();
-  }
-
+  start_connection();
+  start_client();
 }
 
 int posx = 1;
-int posy = 33;
+int posy = 17;
 void loop() {
   if (client.available()) {
     char c = client.read();
     WiFly.end();
-    if (posy < 132)
+    if (posy < 132) {
       LCDPutChar(c, posx, posy, BLACK, BLUE);
+    }
     posx += 8;
     if (posx >= 126) {
       posx = 1;
@@ -72,7 +47,37 @@ void loop() {
 
   if (!client.connected()) {
     client.stop();
-    for(;;)
-      ;
+    WiFly.end();
+    LCDPutString("Disconnected...", 1, 1, RED, BLUE);
+    WiFly.restore();
+    posx = 1;
+    posy = 17;
+    delay(1000);
+    start_client();
   }
+}
+
+void start_connection ()
+{
+  WiFly.restore();
+  while (!WiFly.join(ssid, passphrase)) {
+    WiFly.end();
+    LCDPutString("Failed!", 1, 1, RED, BLUE);
+    WiFly.restore();
+  }
+}
+
+void start_client()
+{
+  WiFly.restore();
+  if (client.connect()) {
+    client.println("HEAD /");
+    WiFly.end();
+    LCDPutString("Connected!", 1, 1, GREEN, BLUE);
+  } else {
+    WiFly.end();
+    LCDPutString("Failed!", 1, 1, RED, BLUE);
+    delay(1000);
+  }
+  WiFly.restore();
 }
