@@ -14,45 +14,52 @@
 Client client("jawaninja.com", 1234);
 
 void setup() {
-  Serial.begin(9600);
-
   WiFly.begin();
-  delay(2000); // Let the shield wake up
   WiFly.end();
 
   LCDIoInit();
   LCDInit();
   LCDClear(BLUE);
-  LCDPutString("Connecting...", 1,1, GREEN, BLUE);
+  LCDPutString("Connecting", 1,1, GREEN, BLUE);
   start_connection();
   start_client();
 }
 
 int posx = 1;
-int posy = 17;
+int posy = 50;
 void loop() {
   if (client.available()) {
     char c = client.read();
-    WiFly.end();
-    if (posy < 132) {
-      LCDPutChar(c, posx, posy, BLACK, BLUE);
-    }
-    posx += 8;
-    if (posx >= 126) {
+    if (c == '*') {
+      // Ignore noise from closing connection
+      while (client.read() != '*') {}
+    } else if (c == '\r') {
+      posx = 1;
+    } else if (c == '\n') {
       posx = 1;
       posy += 16;
+    } else {
+      WiFly.end();
+      if (posy < 132) {
+        LCDPutChar(c, posx, posy, BLACK, BLUE);
+      }
+      posx += 8;
+      if (posx >= 126) {
+        posx = 1;
+        posy += 16;
+      }
+      WiFly.restore();
     }
-    WiFly.restore();
   }
 
   if (!client.connected()) {
     client.stop();
     WiFly.end();
-    LCDPutString("Disconnected...", 1, 1, RED, BLUE);
+    LCDPutString("Disconnected", 1, 1, RED, BLUE);
     WiFly.restore();
     posx = 1;
-    posy = 17;
-    delay(1000);
+    posy = 50;
+    delay(10000);
     start_client();
   }
 }
@@ -62,21 +69,23 @@ void start_connection ()
   WiFly.restore();
   while (!WiFly.join(ssid, passphrase)) {
     WiFly.end();
-    LCDPutString("Failed!", 1, 1, RED, BLUE);
+    LCDPutString("Failed     ", 1, 1, RED, BLUE);
     WiFly.restore();
   }
 }
 
 void start_client()
 {
+  WiFly.end();
+  LCDPutString("Connecting  ", 1,1, GREEN, BLUE);
   WiFly.restore();
   if (client.connect()) {
-    client.println("HEAD /");
+    client.println("test");
     WiFly.end();
-    LCDPutString("Connected!", 1, 1, GREEN, BLUE);
+    LCDPutString("Connected  ", 1, 1, GREEN, BLUE);
   } else {
     WiFly.end();
-    LCDPutString("Failed!", 1, 1, RED, BLUE);
+    LCDPutString("Failed     ", 1, 1, RED, BLUE);
     delay(1000);
   }
   WiFly.restore();
